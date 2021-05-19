@@ -186,10 +186,10 @@ void SeaBattle::repaint()
 	system("cls");
 	cout << "Score: " << player->getScore() << "\t" << "  Score: " << computer->getScore() << endl;
 	//Малюємо верхню частину карти
-	cout << "  ";
+	cout << "yx";
 	for (size_t i = 0; i < WIDTH; i++)
 		cout << i;
-	cout << "        ";
+	cout << "      yx";
 	for (size_t i = 0; i < WIDTH; i++)
 		cout << i;
 	cout << endl;
@@ -202,7 +202,7 @@ void SeaBattle::repaint()
 		{
 			if (Contain(coordPlayer, j, i)) {
 				if (!Contain(coordComputerStep, j, i))
-					cout << "$";
+					cout << "*";
 				else
 					cout << "x";
 			}
@@ -246,8 +246,13 @@ void SeaBattle::Step()
 		int temp_Y;
 		cout << "Ваш хід..." << endl;
 		cout << coordComputer[0].getX() << " " << coordComputer[0].getY() << endl;
-		cout << ">x = "; cin >> temp_X;
-		cout << "\n>y = "; cin >> temp_Y;
+		do {
+			cout << ">x = "; cin >> temp_X;
+			cout << "\n>y = "; cin >> temp_Y;
+			if (Contain(coordPlayerStep, temp_X, temp_Y))
+				cout << "Ви вже робили даинй хід" << endl;
+		} while (Contain(coordPlayerStep, temp_X, temp_Y));
+		
 		if (Contain(coordComputer, temp_X, temp_Y)) {
 			player->addScore(5);
 			Sleep(200);
