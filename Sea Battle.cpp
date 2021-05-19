@@ -38,10 +38,8 @@ public:
 class Coords
 {
 public:
-	Coords(User* user):Coords(user, 0, 0) {}
-	Coords(User* user, int x, int y)
+	Coords(int x, int y)
 	{
-		this->user = user;
 		this->x = x;
 		this->y = y;
 	}
@@ -51,7 +49,6 @@ public:
 private:
 	int x;
 	int y;
-	User* user;
 };
 
 
@@ -156,7 +153,7 @@ void SeaBattle::createMap()
 					flag = true;
 				}
 			}
-			coordPlayer.push_back(Coords(player, temp_x, temp_y));
+			coordPlayer.push_back(Coords(temp_x, temp_y));
 		}
 	}
 
@@ -176,7 +173,7 @@ void SeaBattle::createMap()
 					flag = true;
 				}
 			}
-			coordComputer.push_back(Coords(computer, temp_x, temp_y));
+			coordComputer.push_back(Coords(temp_x, temp_y));
 		}
 	}
 }
@@ -262,7 +259,7 @@ void SeaBattle::Step()
 			Sleep(200);
 			Beep(200, 300);
 		}
-			coordPlayerStep.push_back(Coords(player, temp_X, temp_Y));
+			coordPlayerStep.push_back(Coords(temp_X, temp_Y));
 
 		step = COMPUTER;
 	}
@@ -285,7 +282,7 @@ void SeaBattle::Step()
 			Sleep(200);
 			Beep(200, 300);
 		}
-		coordComputerStep.push_back(Coords(computer, temp_x, temp_y));
+		coordComputerStep.push_back(Coords(temp_x, temp_y));
 
 		step = PLAYER;
 	}
