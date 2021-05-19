@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <vector>
 #include <time.h>
+#include <windows.h>
 
 using namespace std;
 
@@ -14,7 +15,7 @@ bool inGame = true;
 //Енумерація теперішнього ходу
 enum Step
 {
-	PLAYER = 0,
+	PLAYER,
 	COMPUTER
 };
 
@@ -58,23 +59,32 @@ class Player : public User
 {
 public:
 	int getScore();
-
+	void addScore(int score) {
+		this->score += score;
+	}
+private:
+	int score = 0;
 };
 
 int Player::getScore()
 {
-	return 0;
+	return score;
 }
 
 class Computer : public User
 {
 public:
 	int getScore();
+	void addScore(int score) {
+		this->score += score;
+	}
+private:
+	int score = 0;
 };
 
 int Computer::getScore()
 {
-	return 0;
+	return score;
 }
 
 //Головний клас гри
@@ -85,10 +95,11 @@ public:
 	void initGame();
 	void createMap();
 	void repaint();
+	void Step();
 	void update();
 	bool Contain(vector<Coords>& vec, int x, int y);
 private:
-	Step step;
+	enum Step step;
 	Player* player;
 	Computer* computer;
 	User* vinner;
@@ -96,8 +107,8 @@ private:
 	vector<Coords> coordPlayer;
 	vector<Coords> coordComputer;
 	//Координати ходів
-	vector<vector<int>> coordPlayerStep;
-	vector<vector<int>> coordComputerStep;
+	vector<Coords> coordPlayerStep;
+	vector<Coords> coordComputerStep;
 };
 
 SeaBattle::SeaBattle()
@@ -165,7 +176,7 @@ void SeaBattle::createMap()
 					flag = true;
 				}
 			}
-			coordComputer.push_back(Coords(player, temp_x, temp_y));
+			coordComputer.push_back(Coords(computer, temp_x, temp_y));
 		}
 	}
 }
@@ -190,8 +201,13 @@ void SeaBattle::repaint()
 		for (size_t j = 0; j < WIDTH; j++)
 		{
 			if (Contain(coordPlayer, j, i)) {
-				cout << "$";
+				if (!Contain(coordComputerStep, j, i))
+					cout << "$";
+				else
+					cout << "x";
 			}
+			else if (Contain(coordComputerStep, j, i))
+				cout << "o";
 			else
 				cout << " ";
 		}
@@ -199,7 +215,16 @@ void SeaBattle::repaint()
 		cout << i << "|";
 		for (size_t j = 0; j < WIDTH; j++)
 		{
-			cout << " ";
+			if (Contain(coordComputer, j, i)) {
+				if (!Contain(coordPlayerStep, j, i))
+					cout << " ";
+				else
+					cout << "x";
+			}
+			else if (Contain(coordPlayerStep, j, i))
+				cout << "o";
+			else
+				cout << " ";
 		}
 		cout << "|     ";
 		cout << endl;
@@ -214,15 +239,64 @@ void SeaBattle::repaint()
 	cout << endl;
 }
 
+void SeaBattle::Step()
+{
+	if (step == PLAYER) {
+		int temp_X;
+		int temp_Y;
+		cout << "Ваш хід..." << endl;
+		cout << coordComputer[0].getX() << " " << coordComputer[0].getY() << endl;
+		cout << ">x = "; cin >> temp_X;
+		cout << "\n>y = "; cin >> temp_Y;
+		if (Contain(coordComputer, temp_X, temp_Y)) {
+			player->addScore(5);
+			Sleep(200);
+			Beep(800, 200);
+		}
+		else {
+			Sleep(200);
+			Beep(200, 300);
+		}
+			coordPlayerStep.push_back(Coords(player, temp_X, temp_Y));
+
+		step = COMPUTER;
+	}
+	else {
+		cout << "Хід комп'ютера..." << endl;
+		Sleep(200);
+		int temp_x = rand() % WIDTH, 
+			temp_y = rand() % HEIGHT;
+		while (Contain(coordComputerStep, temp_x, temp_y))
+		{
+			temp_x = rand() % WIDTH;
+			temp_y = rand() % HEIGHT;
+		}
+		if (Contain(coordPlayer, temp_x, temp_y)) {
+			computer->addScore(5);
+			Sleep(200);
+			Beep(800, 200);
+		}
+		else {
+			Sleep(200);
+			Beep(200, 300);
+		}
+		coordComputerStep.push_back(Coords(computer, temp_x, temp_y));
+
+		step = PLAYER;
+	}
+}
+
 void SeaBattle::update()
 {
 	repaint();
+	Step();
 }
 
 
 
 int main()
 {
+	SetConsoleOutputCP(1251);
 	srand(time(NULL));
 	SeaBattle game;
 	while (inGame) {
