@@ -55,34 +55,42 @@ private:
 class Player : public User
 {
 public:
-	int getScore();
+	int getScore() {
+		return score;
+	}
 	void addScore(int score) {
 		this->score += score;
 	}
+	int getSteps() {
+		return steps;
+	}
+	void addStep(int step) {
+		steps += step;
+	}
 private:
 	int score = 0;
+	int steps = 0;
 };
-
-int Player::getScore()
-{
-	return score;
-}
 
 class Computer : public User
 {
 public:
-	int getScore();
+	int getScore() {
+		return score;
+	}
 	void addScore(int score) {
 		this->score += score;
 	}
+	int getSteps() {
+		return steps;
+	}
+	void addStep(int step) {
+		steps += step;
+	}
 private:
 	int score = 0;
+	int steps = 0;
 };
-
-int Computer::getScore()
-{
-	return score;
-}
 
 //Головний клас гри
 class SeaBattle : public Game
@@ -148,7 +156,8 @@ void SeaBattle::createMap()
 	{
 		for (size_t i = 0; i < SHIPS_LENGTH; i++)
 		{
-			int temp_x = rand() % WIDTH, temp_y = rand() % HEIGHT;
+			int temp_x = rand() % WIDTH, 
+				temp_y = rand() % HEIGHT;
 			bool flag = true;
 			while (flag)
 			{
@@ -266,6 +275,7 @@ void SeaBattle::Step()
 			Sleep(200);
 			Beep(200, 300);
 		}
+			player->addStep(1);
 			coordPlayerStep.push_back(Coords(temp_X, temp_Y));
 
 		step = COMPUTER;
@@ -289,6 +299,7 @@ void SeaBattle::Step()
 			Sleep(200);
 			Beep(200, 300);
 		}
+		computer->addStep(1);
 		coordComputerStep.push_back(Coords(temp_x, temp_y));
 
 		step = PLAYER;
@@ -298,13 +309,20 @@ void SeaBattle::Step()
 void SeaBattle::showVinnerInfo(Player& pl)
 {
 	system("cls");
-	cout << pl.getScore() << endl;
+	cout << "Вітаю з перемогою!" << endl;
+	cout << "Рахунок: " << player->getScore() << endl;
+	cout << "Кількість ваших ходів: " << player->getSteps() << endl;
+	cout << "Кількість ходів комп'ютера: " << computer->getSteps() << endl;
 }
 
 void SeaBattle::showVinnerInfo(Computer& pc)
 {
 	system("cls");
-	cout << pc.getScore() << endl;
+	cout << "Поразка :(" << endl;
+	cout << "-Наступного разу пощастить!-" << endl;
+	cout << "Рахунок комп'ютера: " << computer->getScore() << endl;
+	cout << "Кількість ходів комп'ютера: " << computer->getSteps() << endl;
+	cout << "Кількість ваших ходів: " << player->getSteps() << endl;
 }
 
 void SeaBattle::checkVinner()
