@@ -93,13 +93,20 @@ public:
 	void createMap();
 	void repaint();
 	void Step();
+	void checkVinner();
+	void showVinnerInfo(Player& pl);
+	void showVinnerInfo(Computer& pc);
 	void update();
 	bool Contain(vector<Coords>& vec, int x, int y);
+	~SeaBattle()
+	{
+		delete player;
+		delete computer;
+	}
 private:
 	enum Step step;
 	Player* player;
 	Computer* computer;
-	User* vinner;
 	//Координати кораблів
 	vector<Coords> coordPlayer;
 	vector<Coords> coordComputer;
@@ -119,7 +126,6 @@ void SeaBattle::initGame()
 	step = PLAYER;
 	player = new Player();
 	computer = new Computer();
-	vinner = nullptr;
 	createMap();
 }
 
@@ -247,9 +253,10 @@ void SeaBattle::Step()
 			cout << ">x = "; cin >> temp_X;
 			cout << "\n>y = "; cin >> temp_Y;
 			if (Contain(coordPlayerStep, temp_X, temp_Y))
-				cout << "Ви вже робили даинй хід" << endl;
-		} while (Contain(coordPlayerStep, temp_X, temp_Y));
-		
+				cout << "Помилка, ви робили даний хід" << endl;
+			else if (temp_X >= WIDTH || temp_Y >= HEIGHT)
+				cout << "Помилкові координати" << endl;
+		} while (temp_X >= WIDTH || temp_Y >= HEIGHT || Contain(coordPlayerStep, temp_X, temp_Y));
 		if (Contain(coordComputer, temp_X, temp_Y)) {
 			player->addScore(5);
 			Sleep(200);
@@ -288,10 +295,37 @@ void SeaBattle::Step()
 	}
 }
 
+void SeaBattle::showVinnerInfo(Player& pl)
+{
+	system("cls");
+	cout << pl.getScore() << endl;
+}
+
+void SeaBattle::showVinnerInfo(Computer& pc)
+{
+	system("cls");
+	cout << pc.getScore() << endl;
+}
+
+void SeaBattle::checkVinner()
+{
+	if (player->getScore() >= 75) {
+		inGame = false;
+		showVinnerInfo(*player);
+	}
+	else if (computer->getScore() >= 75) {
+		inGame = false;
+		showVinnerInfo(*computer);
+	}
+}
+
 void SeaBattle::update()
 {
-	repaint();
-	Step();
+	checkVinner();
+	if (inGame) {
+		repaint();
+		Step();
+	}
 }
 
 
