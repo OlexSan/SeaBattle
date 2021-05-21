@@ -34,7 +34,7 @@ class User
 public:
 	virtual int getScore() = 0;
 };
-
+//Клас координат для зберігання в вектор
 class Coords
 {
 public:
@@ -51,7 +51,7 @@ private:
 	int y;
 };
 
-
+//Клас гравця
 class Player : public User
 {
 public:
@@ -71,7 +71,7 @@ private:
 	int score = 0;
 	int steps = 0;
 };
-
+//Клас комп'ютера
 class Computer : public User
 {
 public:
@@ -128,7 +128,7 @@ SeaBattle::SeaBattle()
 	//Ініціалізація гри
 	initGame();
 }
-
+//Ініціалізація основних об'єктів гри для її запуску
 void SeaBattle::initGame()
 {
 	step = PLAYER;
@@ -136,7 +136,7 @@ void SeaBattle::initGame()
 	computer = new Computer();
 	createMap();
 }
-
+//Перевірка на вмістимість координат в векторі
 bool SeaBattle::Contain(vector<Coords>& vec, int x, int y)
 {
 	for (size_t i = 0; i < vec.size(); i++)
@@ -147,8 +147,7 @@ bool SeaBattle::Contain(vector<Coords>& vec, int x, int y)
 	}
 	return false;
 }
-
-
+//Генерація кораблів для обох сторін
 void SeaBattle::createMap()
 {
 	//Генеруємо кораблі гравця
@@ -192,7 +191,7 @@ void SeaBattle::createMap()
 		}
 	}
 }
-
+//Малюємо карту, метод викликається постійно
 void SeaBattle::repaint()
 {
 	system("cls");
@@ -223,8 +222,10 @@ void SeaBattle::repaint()
 			else
 				cout << " ";
 		}
+
 		cout << "|     ";
 		cout << i << "|";
+
 		for (size_t j = 0; j < WIDTH; j++)
 		{
 			if (Contain(coordComputer, j, i)) {
@@ -250,22 +251,26 @@ void SeaBattle::repaint()
 		cout << "#";
 	cout << endl;
 }
-
+//Робимо хід в залежності від значення змінної step
 void SeaBattle::Step()
 {
 	if (step == PLAYER) {
 		int temp_X;
 		int temp_Y;
 		cout << "Ваш хід..." << endl;
-		cout << coordComputer[0].getX() << " " << coordComputer[0].getY() << endl;
+		//cout << coordComputer[0].getX() << " " << coordComputer[0].getY() << endl;
+
 		do {
 			cout << ">x = "; cin >> temp_X;
 			cout << "\n>y = "; cin >> temp_Y;
+
 			if (Contain(coordPlayerStep, temp_X, temp_Y))
 				cout << "Помилка, ви робили даний хід" << endl;
 			else if (temp_X >= WIDTH || temp_Y >= HEIGHT)
 				cout << "Помилкові координати" << endl;
+
 		} while (temp_X >= WIDTH || temp_Y >= HEIGHT || Contain(coordPlayerStep, temp_X, temp_Y));
+
 		if (Contain(coordComputer, temp_X, temp_Y)) {
 			player->addScore(5);
 			Sleep(200);
@@ -275,21 +280,23 @@ void SeaBattle::Step()
 			Sleep(200);
 			Beep(200, 300);
 		}
-			player->addStep(1);
-			coordPlayerStep.push_back(Coords(temp_X, temp_Y));
 
+		player->addStep(1);
+		coordPlayerStep.push_back(Coords(temp_X, temp_Y));
 		step = COMPUTER;
 	}
 	else {
 		cout << "Хід комп'ютера..." << endl;
-		Sleep(200);
+		Sleep(250);
 		int temp_x = rand() % WIDTH, 
 			temp_y = rand() % HEIGHT;
+
 		while (Contain(coordComputerStep, temp_x, temp_y))
 		{
 			temp_x = rand() % WIDTH;
 			temp_y = rand() % HEIGHT;
 		}
+
 		if (Contain(coordPlayer, temp_x, temp_y)) {
 			computer->addScore(5);
 			Sleep(200);
@@ -299,13 +306,13 @@ void SeaBattle::Step()
 			Sleep(200);
 			Beep(200, 300);
 		}
+
 		computer->addStep(1);
 		coordComputerStep.push_back(Coords(temp_x, temp_y));
-
 		step = PLAYER;
 	}
 }
-
+//Виведення інформації про переможця (гравця)
 void SeaBattle::showVinnerInfo(Player& pl)
 {
 	system("cls");
@@ -314,7 +321,7 @@ void SeaBattle::showVinnerInfo(Player& pl)
 	cout << "Кількість ваших ходів: " << player->getSteps() << endl;
 	cout << "Кількість ходів комп'ютера: " << computer->getSteps() << endl;
 }
-
+//Виведення інформації про переможця (комп'ютера)
 void SeaBattle::showVinnerInfo(Computer& pc)
 {
 	system("cls");
@@ -324,19 +331,20 @@ void SeaBattle::showVinnerInfo(Computer& pc)
 	cout << "Кількість ходів комп'ютера: " << computer->getSteps() << endl;
 	cout << "Кількість ваших ходів: " << player->getSteps() << endl;
 }
-
+//Перевірка переможця, якщо одна з сторін набрала потрібну кількість балів, 
+//встановлюється значення змінної inGame = ture і виводиться інформація про переможця
 void SeaBattle::checkVinner()
 {
-	if (player->getScore() >= 75) {
+	if (player->getScore() >= SHIPS * SHIPS_LENGTH * 5) {
 		inGame = false;
 		showVinnerInfo(*player);
 	}
-	else if (computer->getScore() >= 75) {
+	else if (computer->getScore() >= SHIPS * SHIPS_LENGTH * 5) {
 		inGame = false;
 		showVinnerInfo(*computer);
 	}
 }
-
+//Метод постійно обновляє гру поки вона активна
 void SeaBattle::update()
 {
 	checkVinner();
@@ -352,6 +360,7 @@ int main()
 {
 	SetConsoleOutputCP(1251);
 	srand(time(NULL));
+
 	SeaBattle game;
 	while (inGame) {
 		game.update();
